@@ -1,0 +1,43 @@
+<ASSEMBLER_INFO>
+ <VERSION>2.2.8</VERSION>
+ <DEVICE>"ATmega1284P"</DEVICE>
+ <WORKING_DIR>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_print_number\usart_print_number\Debug</WORKING_DIR>
+ <INCLUDE_PATH>
+  <DIR>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc</DIR>
+  <DIR>C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avrassembler\Include</DIR>
+  <DIR></DIR>
+ </INCLUDE_PATH>
+ <SOURCE_FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_print_number\usart_print_number\main.asm</SOURCE_FILE>
+ <INCLUDED_FILES>
+  <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m1284Pdef.inc</FILE>
+ </INCLUDED_FILES>
+ <OBJECT_FILES>
+  <FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_print_number\usart_print_number\Debug\usart_print_number.obj</FILE>
+ </OBJECT_FILES>
+ <HEX_FILES>
+  <FILE>usart_print_number.hex</FILE>
+ </HEX_FILES>
+ <OUTPUT_FILES>
+  <FILE>usart_print_number.map</FILE>
+  <FILE>usart_print_number.lss</FILE>
+ </OUTPUT_FILES>
+ <LABELS>
+  <start><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_print_number\usart_print_number\main.asm</FILE><LINE>32</LINE></start>
+  <buffer><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_print_number\usart_print_number\main.asm</FILE><LINE>17</LINE></buffer>
+  <msg><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_print_number\usart_print_number\main.asm</FILE><LINE>25</LINE></msg>
+  <var><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_print_number\usart_print_number\main.asm</FILE><LINE>26</LINE></var>
+  <usart_init><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_print_number\usart_print_number\main.asm</FILE><LINE>131</LINE></usart_init>
+  <usart_send_flash><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_print_number\usart_print_number\main.asm</FILE><LINE>165</LINE></usart_send_flash>
+  <add_in_buffer><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_print_number\usart_print_number\main.asm</FILE><LINE>67</LINE></add_in_buffer>
+  <usart_send_sram><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_print_number\usart_print_number\main.asm</FILE><LINE>179</LINE></usart_send_sram>
+  <hlt><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_print_number\usart_print_number\main.asm</FILE><LINE>58</LINE></hlt>
+  <conv_loop><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_print_number\usart_print_number\main.asm</FILE><LINE>74</LINE></conv_loop>
+  <divmod10_32><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_print_number\usart_print_number\main.asm</FILE><LINE>100</LINE></divmod10_32>
+  <div_loop><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_print_number\usart_print_number\main.asm</FILE><LINE>105</LINE></div_loop>
+  <no_sub><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_print_number\usart_print_number\main.asm</FILE><LINE>118</LINE></no_sub>
+  <usart_send_char><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_print_number\usart_print_number\main.asm</FILE><LINE>152</LINE></usart_send_char>
+  <wait_udre><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_print_number\usart_print_number\main.asm</FILE><LINE>153</LINE></wait_udre>
+  <done_flash><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_print_number\usart_print_number\main.asm</FILE><LINE>171</LINE></done_flash>
+  <done_sram><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_print_number\usart_print_number\main.asm</FILE><LINE>185</LINE></done_sram>
+ </LABELS>
+</ASSEMBLER_INFO>
