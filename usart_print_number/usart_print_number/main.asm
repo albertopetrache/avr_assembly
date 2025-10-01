@@ -23,7 +23,7 @@ buffer: .byte 20        ; Reserve 20 bytes in SRAM for converted number
 .cseg
 .org 0x100
 msg: .db "The number is: ", 0   ; Null-terminated string stored in Flash
-var: .dd 98234                  ; 32-bit constant stored in Flash
+var: .dd 98234231                 ; 32-bit constant stored in Flash
 
 
 ; =========================
