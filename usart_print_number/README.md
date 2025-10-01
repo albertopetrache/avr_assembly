@@ -38,7 +38,8 @@ The program is written in AVR Assembly.
 
 Below is an example of the simulation setup in Proteus:
 
-<img width="852" height="632" alt="image" src="https://github.com/user-attachments/assets/ea301b0a-7f29-4f70-874d-a8dd1475d8fe" />
+<img width="928" height="657" alt="image" src="https://github.com/user-attachments/assets/91b46bee-e73d-46b0-bcda-095a5c1a6bda" />
+
 
 
 ## Notes
