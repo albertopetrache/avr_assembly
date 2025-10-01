@@ -1,17 +1,20 @@
+# USART Print Number (AVR Assembly)
+
 ## Overview
 
 This program demonstrates how to read a 32-bit number stored in Flash memory, convert it into an ASCII decimal string, and transmit it over USART (serial communication). A static message is also sent from Flash to indicate the number being printed.
 
-The program is written in AVR Assembly.
+The program is written in AVR Assembly for the **ATmega1284P**.
 
 ## Features
 
 - Initializes the stack pointer (SP) for SRAM usage.
-- Sets up USART for serial transmission at a baud rate corresponding to `F_CPU = 14.7456 MHz`.
+- Sets up USART for serial transmission at **115200 bps** corresponding to `F_CPU = 14.7456 MHz`.
+- Configures USART for **8 data bits, 1 stop bit, no parity**.
 - Converts a 32-bit number stored in Flash memory to a null-terminated ASCII string in SRAM.
 - Sends strings stored in both Flash and SRAM over USART.
 - Uses 32-bit division by 10 implemented bitwise to extract each decimal digit.
-- Simulated in Proteus to verify functionality.  
+- Simulated in Proteus to verify functionality.
 
 ## Registers & Memory
 
@@ -34,16 +37,22 @@ The program is written in AVR Assembly.
 
 5. **Send the number via USART**: The program reads the ASCII characters from SRAM in reverse order (to account for the digit extraction order) and sends them one by one over the serial port.
 
+## USART Configuration
+
+- **Baud rate:** 115200 bps
+- **Data bits:** 8
+- **Stop bits:** 1
+- **Parity:** None
+
+> Note: This configuration assumes an external crystal oscillator at 14.7456 MHz. CKSEL fuse bits must be set accordingly.
+
 ## Proteus Simulation
 
 Below is an example of the simulation setup in Proteus:
 
-<img width="928" height="657" alt="image" src="https://github.com/user-attachments/assets/91b46bee-e73d-46b0-bcda-095a5c1a6bda" />
-
-
+![Proteus Simulation](https://github.com/user-attachments/assets/91b46bee-e73d-46b0-bcda-095a5c1a6bda)
 
 ## Notes
 
-- Assumes external crystal oscillator for accurate USART baud rate. CKSEL fuse bits must be configured accordingly.
-- The program runs on ATmega1284P, but can be adapted to other AVR MCUs with sufficient Flash and SRAM.
-- This program demonstrates low-level bit manipulation, number conversion, and serial communication in AVR assembly.
+- The program runs on ATmega1284P but can be adapted to other AVR MCUs with sufficient Flash and SRAM.
+- Demonstrates low-level bit manipulation, number conversion, and serial communication in AVR assembly.
