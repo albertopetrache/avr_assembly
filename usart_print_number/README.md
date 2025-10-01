@@ -1,9 +1,3 @@
-# usart_print_number.asm
-
-**Author:** Alberto  
-**Date:** 10/1/2025  
-**Microcontroller:** ATmega1284P  
-
 ## Overview
 
 This program demonstrates how to read a 32-bit number stored in Flash memory, convert it into an ASCII decimal string, and transmit it over USART (serial communication). A static message is also sent from Flash to indicate the number being printed.
