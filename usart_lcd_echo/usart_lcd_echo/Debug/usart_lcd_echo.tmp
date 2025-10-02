@@ -22,18 +22,24 @@
   <FILE>usart_lcd_echo.lss</FILE>
  </OUTPUT_FILES>
  <LABELS>
-  <START><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>26</LINE></START>
-  <msg><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>20</LINE></msg>
-  <comenzi_lcd><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>21</LINE></comenzi_lcd>
-  <init_LCD><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>47</LINE></init_LCD>
-  <send_string><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>74</LINE></send_string>
-  <hlt><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>41</LINE></hlt>
-  <delay><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>132</LINE></delay>
-  <send_commands><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>61</LINE></send_commands>
-  <send_commands_done><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>68</LINE></send_commands_done>
-  <lcd_send><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>90</LINE></lcd_send>
-  <send_string_done><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>81</LINE></send_string_done>
-  <delay_loop1><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>134</LINE></delay_loop1>
-  <delay_loop2><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>136</LINE></delay_loop2>
+  <START><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>27</LINE></START>
+  <msg><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>21</LINE></msg>
+  <comenzi_lcd><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>22</LINE></comenzi_lcd>
+  <init_LCD><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>53</LINE></init_LCD>
+  <usart_init><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>136</LINE></usart_init>
+  <usart_send_flash><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>158</LINE></usart_send_flash>
+  <hlt><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>47</LINE></hlt>
+  <delay><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>172</LINE></delay>
+  <send_commands><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>67</LINE></send_commands>
+  <send_commands_done><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>74</LINE></send_commands_done>
+  <lcd_send><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>96</LINE></lcd_send>
+  <send_string><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>80</LINE></send_string>
+  <send_string_done><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>87</LINE></send_string_done>
+  <usart_send_char><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>148</LINE></usart_send_char>
+  <wait_udre><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>150</LINE></wait_udre>
+  <done_flash><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>164</LINE></done_flash>
+  <delay_loop1><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>174</LINE></delay_loop1>
+  <delay_loop2><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>176</LINE></delay_loop2>
+  <usart_rx_isr><FILE>C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm</FILE><LINE>184</LINE></usart_rx_isr>
  </LABELS>
 </ASSEMBLER_INFO>

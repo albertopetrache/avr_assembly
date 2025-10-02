@@ -13,11 +13,12 @@
 .def L    = r19           ; Lower nibble temporary storage
 .def temp = r20           ; Temporary register for RS handling
 
+
 .org 0x0000
     rjmp START            ; Reset vector ? jump to program start
 
 .org 0x100
-msg: .db "Hello, World", 0, 0     ; String to display on LCD (null-terminated)
+msg: .db "Enter a string: ", 0, 0     ; String to display on LCD (null-terminated)
 comenzi_lcd: .db 0x02, 0x28, 0x0C, 0x06, 0x01, 0x00 ; LCD init commands (end with 0x00)
 
 ; =============================
@@ -32,11 +33,14 @@ START:
 
     ; Initialize LCD
     rcall init_LCD
+	; Initialize USART
+	rcall usart_init
+	sei    
 
-    ; Send string stored in Flash to LCD
-    ldi ZL, low(msg*2)    ; Load pointer to message
-    ldi ZH, high(msg*2)
-    rcall send_string
+	;send string USART
+	ldi ZL, low(msg*2)
+	ldi ZH, high(msg*2)
+	rcall usart_send_flash
 
 hlt:
     rjmp hlt              ; Infinite loop
@@ -125,6 +129,40 @@ lcd_send:
     rcall delay           ; Extra delay for LCD processing
     ret
 
+
+
+usart_init:
+	ldi r16, 7
+	sts UBRR0L, r16
+	ldi r16, 0
+	sts UBRR0H, r16
+
+	ldi r16, (1<<TXEN0) | (1<<RXEN0) | (1<<RXCIE0)
+	sts UCSR0B, r16
+	ldi r16, (1<<UCSZ00) | (1<<UCSZ01)
+	sts UCSR0C, r16
+	ret
+
+usart_send_char:
+	;avem caracterul in r16
+wait_udre:
+	lds r17, UCSR0A
+	sbrs r17, UDRE0
+	rjmp wait_udre
+
+	sts UDR0, r16
+	ret
+
+usart_send_flash:
+	lpm r16, Z+
+	tst r16
+	breq done_flash
+	rcall usart_send_char
+	rjmp usart_send_flash
+done_flash:
+	ret
+
+
 ; =============================
 ; Simple software delay
 ; Adjust values for ~timing
@@ -139,3 +177,15 @@ delay_loop2:
     dec r16
     brne delay_loop1
     ret
+
+.org 0x0028
+usart_rx_isr:
+	lds r16, UDR0         ; ia caracterul primit
+	ldi temp, (1<<RS)     ; RS=1 ? Data mode (scriem caracter pe LCD)
+	rcall lcd_send
+
+	; op?ional: retrimite caracterul înapoi pe serial (echo)
+	rcall usart_send_char
+
+	reti
+
