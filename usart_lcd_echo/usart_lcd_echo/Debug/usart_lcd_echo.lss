@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.8  C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm Thu Oct 02 21:41:02 2025
+AVRASM ver. 2.2.8  C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm Fri Oct 03 18:09:32 2025
 
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m1284Pdef.inc'
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m1284Pdef.inc'
@@ -1231,25 +1231,25 @@ AVRASM ver. 2.2.8  C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo
                                  
                                  ; ***** END OF FILE ******************************************************
                                  
-                                 ; LCD interface with ATmega
-                                 ; 4-bit communication mode
-                                 ; Sends initialization commands and a string to LCD
-                                 ; =============================
-                                 
-                                 .equ LCD_PORT = PORTA     ; LCD data & control lines connected to PORTA
-                                 .equ LCD_DDR  = DDRA      ; Data Direction Register for LCD port
-                                 .equ RS       = PA0       ; Register Select pin (0 = command, 1 = data)
+                                 ; LCD & control pin definitions
+                                 .equ LCD_PORT = PORTA
+                                 .equ LCD_DDR  = DDRA
+                                 .equ RS       = PA0       ; Register Select pin
                                  .equ EN       = PA1       ; Enable pin
                                  
-                                 .def U    = r18           ; Upper nibble temporary storage
-                                 .def L    = r19           ; Lower nibble temporary storage
-                                 .def temp = r20           ; Temporary register for RS handling
+                                 ; General purpose registers
+                                 .def U         = r18
+                                 .def L         = r19
+                                 .def cursor_cnt= r22       ; Current cursor position on current line (0..15)
+                                 .def line      = r23       ; Current line: 0 = line 1, 1 = line 2
+                                 .def line1_len = r24       ; Number of characters written on line 1
                                  
-                                 
+                                 ; =============================
                                  .org 0x0000
-000000 c10b                          rjmp START            ; Reset vector ? jump to program start
+000000 c10b                          rjmp START             ; Reset vector
                                  
                                  .org 0x100
+                                 ; =============================
 000100 6e45
 000101 6574
 000102 2072
@@ -1258,181 +1258,257 @@ AVRASM ver. 2.2.8  C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo
 000105 6972
 000106 676e
 000107 203a
-000108 0000                      msg: .db "Enter a string: ", 0, 0     ; String to display on LCD (null-terminated)
+000108 0000                      msg: .db "Enter a string: ",0,0       ; Initial message to send via USART
 000109 2802
 00010a 060c
-00010b 0001                      comenzi_lcd: .db 0x02, 0x28, 0x0C, 0x06, 0x01, 0x00 ; LCD init commands (end with 0x00)
+00010b 0001                      comenzi_lcd: .db 0x02,0x28,0x0C,0x06,0x01,0x00  ; LCD initialization commands
                                  
-                                 ; =============================
-                                 ; Program entry point
                                  ; =============================
                                  START:
                                      ; Initialize stack pointer
 00010c e400                          ldi r16, high(RAMEND)
-00010d bf0e                          out SPH, r16
+00010d bf0e                          out SPH,r16
 00010e ef0f                          ldi r16, low(RAMEND)
-00010f bf0d                          out SPL, r16
+00010f bf0d                          out SPL,r16
                                  
-                                     ; Initialize LCD
-000110 d006                          rcall init_LCD
-                                 	; Initialize USART
-000111 d035                      	rcall usart_init
-000112 9478                      	sei
+                                     ; Initialize LCD and USART
+000110 d00b                          rcall init_LCD
+000111 d042                          rcall usart_init
+000112 9478                          sei                        ; Enable global interrupts
                                  
-                                     
+                                     ; Initialize cursor state
+000113 e060                          ldi cursor_cnt,0
+000114 e070                          ldi line,0
+000115 e080                          ldi line1_len,0
+000116 e800                          ldi r16,0x80               ; DDRAM address of start of line 1
+000117 df3b                          rcall lcd_send_cmd_direct
                                  
-                                 	;send string USART
-000113 e0e0                      	ldi ZL, low(msg*2)
-000114 e0f2                      	ldi ZH, high(msg*2)
-000115 d045                      	rcall usart_send_flash
+                                     ; Send initial message via USART
+000118 e0e0                          ldi ZL, low(msg*2)
+000119 e0f2                          ldi ZH, high(msg*2)
+00011a d04d                          rcall usart_send_flash
                                  
-                                 hlt:
-000116 cfff                          rjmp hlt              ; Infinite loop
+                                 main_loop:
+00011b cfff                          rjmp main_loop             ; Main loop does nothing, all handled in ISR
                                  
-                                 ; =============================
-                                 ; LCD Initialization
                                  ; =============================
                                  init_LCD:
-000117 ef0f                          ldi r16, 0xFF
-000118 b901                          out LCD_DDR, r16      ; Set all PORTA pins as output
-                                     
-000119 d047                          rcall delay           ; Initial delay after power-up
-                                     
-00011a e1e2                          ldi ZL, low(comenzi_lcd*2)  ; Point to LCD commands in Flash
-00011b e0f2                          ldi ZH, high(comenzi_lcd*2)
-00011c d001                          rcall send_commands
-00011d 9508                          ret
+00011c ef0f                          ldi r16,0xFF
+00011d b901                          out LCD_DDR,r16            ; Set LCD port as output
+00011e d04f                          rcall delay
+00011f e1e2                          ldi ZL, low(comenzi_lcd*2)
+000120 e0f2                          ldi ZH, high(comenzi_lcd*2)
+000121 d001                          rcall send_commands
+000122 9508                          ret
                                  
-                                 ; =============================
-                                 ; Send initialization commands from Flash
-                                 ; =============================
                                  send_commands:
-00011e 9105                          lpm r16, Z+           ; Load next command
-00011f 2300                          tst r16               ; Check if command = 0 (end of list)
-000120 f019                          breq send_commands_done
-000121 2744                          clr temp              ; temp = 0 ? RS = 0 (command mode)
-000122 d009                          rcall lcd_send
-000123 cffa                          rjmp send_commands
+000123 9105                          lpm r16,Z+
+000124 2300                          tst r16
+000125 f011                          breq send_commands_done
+000126 d002                          rcall lcd_send_cmd
+000127 cffb                          rjmp send_commands
                                  send_commands_done:
-000124 9508                          ret
+000128 9508                          ret
                                  
                                  ; =============================
-                                 ; Send string characters from Flash
-                                 ; =============================
-                                 send_string:
-000125 9105                          lpm r16, Z+           ; Load next character
-000126 2300                          tst r16               ; Check for null terminator
-000127 f019                          breq send_string_done
-000128 e041                          ldi temp, (1<<RS)     ; temp = RS bit set ? data mode
-000129 d002                          rcall lcd_send
-00012a cffa                          rjmp send_string
-                                 send_string_done:
-00012b 9508                          ret
+                                 lcd_send_cmd:
+000129 930f                          push r16
+00012a d014                          rcall lcd_send
+00012b 910f                          pop r16
+00012c 9508                          ret
                                  
-                                 ; =============================
-                                 ; Unified routine to send data/commands to LCD
-                                 ; Input:
-                                 ;   r16 = byte (command or character)
-                                 ;   temp = 0 for command, (1<<RS) for data
-                                 ; =============================
+                                 ; Send a character to LCD (increment cursor)
+                                 lcd_send_data:
+00012d 3160                          cpi cursor_cnt,16
+00012e f448                          brsh ignore_char           ; Ignore if line full
+                                 
+00012f 930f                          push r16
+000130 9a10                          sbi LCD_PORT,RS            ; Set RS=1 for data
+000131 d00d                          rcall lcd_send
+000132 9810                          cbi LCD_PORT,RS
+000133 910f                          pop r16
+                                 
+000134 9563                          inc cursor_cnt
+                                     
+                                     ; Update line 1 length if writing on line 1
+000135 3070                          cpi line,0
+000136 f409                          brne ignore_char
+000137 2f86                          mov line1_len,cursor_cnt
+                                 ignore_char:
+000138 9508                          ret
+                                 
+                                 ; Send character without incrementing cursor
+                                 lcd_send_data_no_inc:
+000139 930f                          push r16
+00013a 9a10                          sbi LCD_PORT,RS
+00013b d003                          rcall lcd_send
+00013c 9810                          cbi LCD_PORT,RS
+00013d 910f                          pop r16
+00013e 9508                          ret
+                                 
+                                 ; Send data/command to LCD (4-bit mode)
                                  lcd_send:
-00012c 934f                          push temp             ; Save RS setting
-                                     
-                                     ; Split into nibbles
-00012d 2f20                          mov U, r16
-00012e 7f20                          andi U, 0xF0          ; Upper nibble in U
-00012f 2f30                          mov L, r16
-000130 9532                          swap L                ; Move lower nibble into upper 4 bits
-000131 7f30                          andi L, 0xF0
-                                     
-                                     ; ----- Send upper nibble -----
-000132 b112                          in r17, LCD_PORT      ; Read current port state
-000133 701f                          andi r17, 0x0F        ; Clear upper nibble
-000134 2b12                          or r17, U             ; Merge with upper nibble
-000135 914f                          pop temp              ; Restore RS
-000136 2b14                          or r17, temp          ; Apply RS setting
-000137 b912                          out LCD_PORT, r17
-                                     
-000138 9a11                          sbi LCD_PORT, EN      ; Pulse Enable high
-000139 d027                          rcall delay
-00013a 9811                          cbi LCD_PORT, EN      ; Pulse Enable low
-                                     
-                                     ; ----- Send lower nibble -----
-00013b 934f                          push temp             ; Save RS again
-00013c b112                          in r17, LCD_PORT
-00013d 701f                          andi r17, 0x0F
-00013e 2b13                          or r17, L             ; Merge with lower nibble
-00013f 914f                          pop temp
-000140 2b14                          or r17, temp
-000141 b912                          out LCD_PORT, r17
-                                     
-000142 9a11                          sbi LCD_PORT, EN      ; Pulse Enable high
-000143 d01d                          rcall delay
-000144 9811                          cbi LCD_PORT, EN      ; Pulse Enable low
-                                     
-000145 d01b                          rcall delay           ; Extra delay for LCD processing
-000146 9508                          ret
+00013f 2f20                          mov U,r16
+000140 7f20                          andi U,0xF0
+000141 2f30                          mov L,r16
+000142 9532                          swap L
+000143 7f30                          andi L,0xF0
                                  
+                                     ; Send upper nibble
+000144 b112                          in r17,LCD_PORT
+000145 701f                          andi r17,0x0F
+000146 2b12                          or r17,U
+000147 b912                          out LCD_PORT,r17
+000148 9a11                          sbi LCD_PORT,EN
+000149 d024                          rcall delay
+00014a 9811                          cbi LCD_PORT,EN
                                  
+                                     ; Send lower nibble
+00014b b112                          in r17,LCD_PORT
+00014c 701f                          andi r17,0x0F
+00014d 2b13                          or r17,L
+00014e b912                          out LCD_PORT,r17
+00014f 9a11                          sbi LCD_PORT,EN
+000150 d01d                          rcall delay
+000151 9811                          cbi LCD_PORT,EN
                                  
+000152 d01b                          rcall delay
+000153 9508                          ret
+                                 
+                                 ; =============================
                                  usart_init:
-000147 e007                      	ldi r16, 7
-000148 9300 00c4                 	sts UBRR0L, r16
-00014a e000                      	ldi r16, 0
-00014b 9300 00c5                 	sts UBRR0H, r16
-                                 
-00014d e908                      	ldi r16, (1<<TXEN0) | (1<<RXEN0) | (1<<RXCIE0)
-00014e 9300 00c1                 	sts UCSR0B, r16
-000150 e006                      	ldi r16, (1<<UCSZ00) | (1<<UCSZ01)
-000151 9300 00c2                 	sts UCSR0C, r16
-000153 9508                      	ret
+000154 e007                          ldi r16,7
+000155 9300 00c4                     sts UBRR0L,r16             ; Set baud rate low byte
+000157 e000                          ldi r16,0
+000158 9300 00c5                     sts UBRR0H,r16             ; Set baud rate high byte
+00015a e908                          ldi r16,(1<<TXEN0)|(1<<RXEN0)|(1<<RXCIE0)
+00015b 9300 00c1                     sts UCSR0B,r16             ; Enable TX, RX, RX interrupt
+00015d e006                          ldi r16,(1<<UCSZ00)|(1<<UCSZ01)
+00015e 9300 00c2                     sts UCSR0C,r16             ; 8-bit data
+000160 9508                          ret
                                  
                                  usart_send_char:
-                                 	;avem caracterul in r16
                                  wait_udre:
-000154 9110 00c0                 	lds r17, UCSR0A
-000156 ff15                      	sbrs r17, UDRE0
-000157 cffc                      	rjmp wait_udre
-                                 
-000158 9300 00c6                 	sts UDR0, r16
-00015a 9508                      	ret
-                                 
-                                 usart_send_flash:
-00015b 9105                      	lpm r16, Z+
-00015c 2300                      	tst r16
-00015d f011                      	breq done_flash
-00015e dff5                      	rcall usart_send_char
-00015f cffb                      	rjmp usart_send_flash
-                                 done_flash:
-000160 9508                      	ret
-                                 
-                                 
-                                 ; =============================
-                                 ; Simple software delay
-                                 ; Adjust values for ~timing
-                                 ; =============================
-                                 delay:
-000161 e104                          ldi r16, 20
-                                 delay_loop1:
-000162 e916                          ldi r17, 150
-                                 delay_loop2:
-000163 951a                          dec r17
-000164 f7f1                          brne delay_loop2
-000165 950a                          dec r16
-000166 f7d9                          brne delay_loop1
+000161 9110 00c0                     lds r17,UCSR0A
+000163 ff15                          sbrs r17,UDRE0
+000164 cffc                          rjmp wait_udre
+000165 9300 00c6                     sts UDR0,r16
 000167 9508                          ret
                                  
+                                 usart_send_flash:
+000168 9105                          lpm r16,Z+
+000169 2300                          tst r16
+00016a f011                          breq done_flash
+00016b dff5                          rcall usart_send_char
+00016c cffb                          rjmp usart_send_flash
+                                 done_flash:
+00016d 9508                          ret
+                                 
+                                 ; =============================
+                                 delay:
+00016e e104                          ldi r16,20
+                                 delay_loop1:
+00016f e916                          ldi r17,150
+                                 delay_loop2:
+000170 951a                          dec r17
+000171 f7f1                          brne delay_loop2
+000172 950a                          dec r16
+000173 f7d9                          brne delay_loop1
+000174 9508                          ret
+                                 
+                                 ; =============================
                                  .org 0x0028
                                  usart_rx_isr:
-000028 9100 00c6                 	lds r16, UDR0         ; ia caracterul primit
-00002a e041                      	ldi temp, (1<<RS)     ; RS=1 ? Data mode (scriem caracter pe LCD)
-00002b d100                      	rcall lcd_send
+000028 9100 00c6                     lds r16,UDR0
                                  
-                                 	; op?ional: retrimite caracterul înapoi pe serial (echo)
-00002c d127                      	rcall usart_send_char
+                                     ; Check for backspace
+00002a 3008                          cpi r16,0x08
+00002b f021                          breq handle_backspace
                                  
-00002d 9518                      	reti
+                                     ; Check for Enter
+00002c 300d                          cpi r16,0x0D
+00002d f0c1                          breq enter_pressed
                                  
+                                     ; Normal character input
+00002e d0fe                          rcall lcd_send_data    
+00002f 9518                          reti
+                                 
+                                 ; =============================
+                                 handle_backspace:
+                                     ; If cursor is not at start of line
+000030 3060                          cpi cursor_cnt,0
+000031 f059                          breq check_previous_line
+                                     
+                                     ; Delete current character
+000032 956a                          dec cursor_cnt
+                                     
+                                     ; Move cursor left
+000033 e100                          ldi r16,0x10
+000034 d01e                          rcall lcd_send_cmd_direct
+                                 
+                                     ; Overwrite with space
+000035 e200                          ldi r16,' '
+000036 d102                          rcall lcd_send_data_no_inc
+                                 
+                                     ; Move cursor left again
+000037 e100                          ldi r16,0x10
+000038 d01a                          rcall lcd_send_cmd_direct
+                                     
+                                     ; Update line 1 length if needed
+000039 3070                          cpi line,0
+00003a f409                          brne backspace_done
+00003b 2f86                          mov line1_len,cursor_cnt
+                                     
+                                 backspace_done:
+00003c 9518                          reti
+                                 
+                                 ; Move to previous line if on line 2
+                                 check_previous_line:
+00003d 3071                          cpi line,1
+00003e f431                          brne ignore_backspace       ; Stop if already on line 1
+                                 
+                                     ; Switch to line 1
+00003f e070                          ldi line,0
+000040 2f68                          mov cursor_cnt,line1_len
+                                     
+                                     ; Position cursor correctly on last character of line 1
+000041 e800                          ldi r16,0x80
+000042 0f08                          add r16,line1_len
+000043 d00f                          rcall lcd_send_cmd_direct
+000044 9518                          reti
+                                 
+                                 ignore_backspace:
+000045 9518                          reti
+                                 
+                                 ; =============================
+                                 enter_pressed:
+000046 3070                          cpi line,0
+000047 f431                          brne enter_on_line2
+                                     
+                                     ; Enter pressed on line 1: save length and move to line 2
+000048 2f86                          mov line1_len,cursor_cnt
+000049 ec00                          ldi r16,0xC0
+00004a d008                          rcall lcd_send_cmd_direct
+00004b e060                          ldi cursor_cnt,0
+00004c e071                          ldi line,1
+00004d 9518                          reti
+                                 
+                                 enter_on_line2:
+                                     ; Enter pressed on line 2: return to line 1
+00004e e800                          ldi r16,0x80
+00004f d003                          rcall lcd_send_cmd_direct
+000050 e060                          ldi cursor_cnt,0
+000051 e070                          ldi line,0
+000052 9518                          reti
+                                 
+                                 ; =============================
+                                 lcd_send_cmd_direct:
+000053 930f                          push r16
+000054 9810                          cbi LCD_PORT,RS           ; RS=0 for command
+000055 d0e9                          rcall lcd_send
+000056 9a10                          sbi LCD_PORT,RS           ; Restore RS=1 for data
+000057 910f                          pop r16
+000058 9508                          ret
 
 
 RESOURCE USE INFORMATION
@@ -1450,40 +1526,40 @@ counted separately from r26..r31 here.
 .dseg memory usage only counts static data declared with .byte
 
 "ATmega1284P" register use summary:
-x  :   0 y  :   0 z  :   3 r0 :   0 r1 :   0 r2 :   0 r3 :   0 r4 :   0 
+x  :   0 y  :   0 z  :   2 r0 :   0 r1 :   0 r2 :   0 r3 :   0 r4 :   0 
 r5 :   0 r6 :   0 r7 :   0 r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 
-r13:   0 r14:   0 r15:   0 r16:  26 r17:  14 r18:   3 r19:   4 r20:   9 
-r21:   0 r22:   0 r23:   0 r24:   0 r25:   0 r26:   0 r27:   0 r28:   0 
+r13:   0 r14:   0 r15:   0 r16:  42 r17:  12 r18:   3 r19:   4 r20:   0 
+r21:   0 r22:  11 r23:   8 r24:   6 r25:   0 r26:   0 r27:   0 r28:   0 
 r29:   0 r30:   2 r31:   2 
-Registers used: 8 out of 35 (22.9%)
+Registers used: 10 out of 35 (28.6%)
 
 "ATmega1284P" instruction use summary:
-.lds  :   0 .sts  :   0 adc   :   0 add   :   0 adiw  :   0 and   :   0 
+.lds  :   0 .sts  :   0 adc   :   0 add   :   1 adiw  :   0 and   :   0 
 andi  :   4 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0 
-brcc  :   0 brcs  :   0 break :   0 breq  :   3 brge  :   0 brhc  :   0 
+brcc  :   0 brcs  :   0 break :   0 breq  :   5 brge  :   0 brhc  :   0 
 brhs  :   0 brid  :   0 brie  :   0 brlo  :   0 brlt  :   0 brmi  :   0 
-brne  :   2 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
-brvs  :   0 bset  :   0 bst   :   0 call  :   0 cbi   :   2 cbr   :   0 
-clc   :   0 clh   :   0 cli   :   0 cln   :   0 clr   :   1 cls   :   0 
+brne  :   6 brpl  :   0 brsh  :   1 brtc  :   0 brts  :   0 brvc  :   0 
+brvs  :   0 bset  :   0 bst   :   0 call  :   0 cbi   :   5 cbr   :   0 
+clc   :   0 clh   :   0 cli   :   0 cln   :   0 clr   :   0 cls   :   0 
 clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :   0 cpc   :   0 
-cpi   :   0 cpse  :   0 dec   :   2 elpm  :   0 eor   :   0 fmul  :   0 
-fmuls :   0 fmulsu:   0 icall :   0 ijmp  :   0 in    :   2 inc   :   0 
-jmp   :   0 ld    :   0 ldd   :   0 ldi   :  15 lds   :   2 lpm   :   3 
-lsl   :   0 lsr   :   0 mov   :   2 movw  :   0 mul   :   0 muls  :   0 
-mulsu :   0 neg   :   0 nop   :   0 or    :   4 ori   :   0 out   :   5 
-pop   :   2 push  :   2 rcall :  13 ret   :   8 reti  :   1 rjmp  :   6 
-rol   :   0 ror   :   0 sbc   :   0 sbci  :   0 sbi   :   2 sbic  :   0 
+cpi   :   8 cpse  :   0 dec   :   3 elpm  :   0 eor   :   0 fmul  :   0 
+fmuls :   0 fmulsu:   0 icall :   0 ijmp  :   0 in    :   2 inc   :   1 
+jmp   :   0 ld    :   0 ldd   :   0 ldi   :  28 lds   :   2 lpm   :   2 
+lsl   :   0 lsr   :   0 mov   :   6 movw  :   0 mul   :   0 muls  :   0 
+mulsu :   0 neg   :   0 nop   :   0 or    :   2 ori   :   0 out   :   5 
+pop   :   4 push  :   4 rcall :  22 ret   :  11 reti  :   6 rjmp  :   5 
+rol   :   0 ror   :   0 sbc   :   0 sbci  :   0 sbi   :   5 sbic  :   0 
 sbis  :   0 sbiw  :   0 sbr   :   0 sbrc  :   0 sbrs  :   1 sec   :   0 
 seh   :   0 sei   :   1 sen   :   0 ser   :   0 ses   :   0 set   :   0 
 sev   :   0 sez   :   0 sleep :   0 spm   :   0 st    :   0 std   :   0 
-sts   :   5 sub   :   0 subi  :   0 swap  :   1 tst   :   3 wdr   :   0 
+sts   :   5 sub   :   0 subi  :   0 swap  :   1 tst   :   2 wdr   :   0 
 
-Instructions used: 25 out of 114 (21.9%)
+Instructions used: 28 out of 114 (24.6%)
 
 "ATmega1284P" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x0002d0    198     24    222  131072   0.2%
+[.cseg] 0x000000 0x0002ea    310     24    334  131072   0.3%
 [.dseg] 0x000100 0x000100      0      0      0   16384   0.0%
 [.eseg] 0x000000 0x000000      0      0      0    4096   0.0%
 

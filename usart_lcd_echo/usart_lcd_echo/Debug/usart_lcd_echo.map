@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.8  C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm Thu Oct 02 21:41:02 2025
+AVRASM ver. 2.2.8  C:\Users\alber\OneDrive\Documents\avr_assembly\usart_lcd_echo\usart_lcd_echo\main.asm Fri Oct 03 18:09:32 2025
 
 
 EQU  SIGNATURE_000 0000001e
@@ -892,23 +892,34 @@ EQU  RS           00000000
 EQU  EN           00000001
 DEF  U            r18
 DEF  L            r19
-DEF  temp         r20
+DEF  cursor_cnt   r22
+DEF  line         r23
+DEF  line1_len    r24
 CSEG START        0000010c
 CSEG msg          00000100
 CSEG comenzi_lcd  00000109
-CSEG init_LCD     00000117
-CSEG usart_init   00000147
-CSEG usart_send_flash 0000015b
-CSEG hlt          00000116
-CSEG delay        00000161
-CSEG send_commands 0000011e
-CSEG send_commands_done 00000124
-CSEG lcd_send     0000012c
-CSEG send_string  00000125
-CSEG send_string_done 0000012b
-CSEG usart_send_char 00000154
-CSEG wait_udre    00000154
-CSEG done_flash   00000160
-CSEG delay_loop1  00000162
-CSEG delay_loop2  00000163
+CSEG init_LCD     0000011c
+CSEG usart_init   00000154
+CSEG lcd_send_cmd_direct 00000053
+CSEG usart_send_flash 00000168
+CSEG main_loop    0000011b
+CSEG delay        0000016e
+CSEG send_commands 00000123
+CSEG send_commands_done 00000128
+CSEG lcd_send_cmd 00000129
+CSEG lcd_send     0000013f
+CSEG lcd_send_data 0000012d
+CSEG ignore_char  00000138
+CSEG lcd_send_data_no_inc 00000139
+CSEG usart_send_char 00000161
+CSEG wait_udre    00000161
+CSEG done_flash   0000016d
+CSEG delay_loop1  0000016f
+CSEG delay_loop2  00000170
 CSEG usart_rx_isr 00000028
+CSEG handle_backspace 00000030
+CSEG enter_pressed 00000046
+CSEG check_previous_line 0000003d
+CSEG backspace_done 0000003c
+CSEG ignore_backspace 00000045
+CSEG enter_on_line2 0000004e
