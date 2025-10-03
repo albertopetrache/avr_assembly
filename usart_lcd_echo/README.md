@@ -1,6 +1,6 @@
 # LCD & USART Text Input Project
 
-This project demonstrates a simple text input system using an AVR microcontroller with a 16x2 LCD and USART communication. The program allows typing characters via a serial terminal, displaying them on the LCD, handling **Enter** for line changes, and **Backspace** for deleting characters correctly.
+This project demonstrates a simple text input system using an AVR microcontroller with a 16x2 LCD and USART communication. The program allows typing characters via a serial terminal, displaying them on the LCD, handling **Enter** for line changes, and **Backspace** for deleting characters.
 
 ---
 
