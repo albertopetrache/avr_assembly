@@ -82,6 +82,12 @@ All input handling is interrupt-driven via the **USART RX ISR**.
 
 ---
 
+## Hardware Schematic
+
+![LCD & USART schematic](https://github.com/user-attachments/assets/7ce8ed14-79b5-4143-bb22-4c29f21102df)
+
+---
+
 ## Registers & Variables
 
 - **U (r18), L (r19):** Nibble registers for LCD transfers.  
@@ -110,7 +116,3 @@ All input handling is interrupt-driven via the **USART RX ISR**.
 - System is interrupt-driven, so the main loop is empty (`rjmp main_loop`).
 - RW is grounded (write-only mode) for simplicity.
 - Cursor handling is done in software, not via LCD auto-increment alone, to enable proper backspace and line switching.
-
-## Hardware Schematic
-
-![LCD & USART schematic](https://github.com/user-attachments/assets/7ce8ed14-79b5-4143-bb22-4c29f21102df)
